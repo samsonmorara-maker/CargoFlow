@@ -11,9 +11,10 @@ class User( BaseModel, AbstractBaseUser, PermissionsMixin ):
         ADMIN = "ADMIN", "Admin"
     
     username = None
-
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True, db_index=True)
-    phone_number = models.CharField(max_length=20, blank=True)
+    phone_number = models.CharField(max_length=20)
 
     role = models.CharField(
         max_length=20,
@@ -35,7 +36,7 @@ class User( BaseModel, AbstractBaseUser, PermissionsMixin ):
     REQUIRED_FIELDS = []
 
     objects = UserManager()
-    
+
     class Meta:
         ordering = ["-created_at"]
         verbose_name = "User"

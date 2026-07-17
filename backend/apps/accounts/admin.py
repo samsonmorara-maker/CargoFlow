@@ -9,7 +9,10 @@ class CustomUserAdmin(UserAdmin):
     model = User
 
     list_display = (
+
         "email",
+        "first_name",
+        "last_name",
         "phone_number",
         "role",
         "is_verified",
@@ -28,6 +31,8 @@ class CustomUserAdmin(UserAdmin):
 
     search_fields = (
         "email",
+        "first_name",
+        "last_name",
         "phone_number",
     )
 
