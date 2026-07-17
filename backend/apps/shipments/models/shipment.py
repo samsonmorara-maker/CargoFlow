@@ -47,6 +47,15 @@ class Shipment(BaseModel):
         related_name="shipments",
     )
 
+    driver = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    related_name="assigned_shipments",
+    null=True,
+    blank=True,
+    limit_choices_to={"role": User.Role.DRIVER},
+)
+
     goods_type = models.CharField(
         max_length=30,
         choices=GoodsType.choices,

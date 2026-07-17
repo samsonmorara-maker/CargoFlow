@@ -12,6 +12,10 @@ class ShipmentSerializer(serializers.ModelSerializer):
         read_only_fields = (
             "uuid",
             "tracking_number",
+            "customer",
+            "driver",
+            "status",
+            "final_price",
             "created_at",
             "updated_at",
             "created_by",
