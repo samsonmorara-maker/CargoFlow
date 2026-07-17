@@ -1,10 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
+from apps.common.models import TimeStampedModel
 from apps.accounts.managers import UserManager
 
 
-class User(AbstractUser):
+class User(AbstractUser, TimeStampedModel):
     class Role(models.TextChoices):
         CUSTOMER = "CUSTOMER", "Customer"
         DRIVER = "DRIVER", "Driver"
