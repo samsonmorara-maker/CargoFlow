@@ -1,8 +1,8 @@
 from django.db import models
 from apps.accounts.models.user import User
-from apps.common.models import TimeStampedModel
+from apps.common.models import BaseModel
 
-class DriverProfile(TimeStampedModel):
+class DriverProfile(BaseModel):
     class VerificationStatus(models.TextChoices):
         PENDING = "PENDING", "Pending"
         APPROVED = "APPROVED", "Approved"

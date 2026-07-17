@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from apps.accounts.models import User, DriverProfile
+from apps.accounts.models import DriverProfile, User
 
 
 @admin.register(User)
@@ -10,8 +10,7 @@ class CustomUserAdmin(UserAdmin):
 
     list_display = (
         "email",
-        "first_name",
-        "last_name",
+        "phone_number",
         "role",
         "is_verified",
         "is_staff",
@@ -29,16 +28,24 @@ class CustomUserAdmin(UserAdmin):
 
     search_fields = (
         "email",
-        "first_name",
-        "last_name",
+        "phone_number",
+    )
+
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+        "uuid",
     )
 
     fieldsets = (
-        (None, {"fields": ("email", "password")}),
-        ("Personal Information", {
+        (None, {
             "fields": (
-                "first_name",
-                "last_name",
+                "email",
+                "password",
+            )
+        }),
+        ("Profile", {
+            "fields": (
                 "phone_number",
                 "profile_picture",
             )
@@ -58,10 +65,12 @@ class CustomUserAdmin(UserAdmin):
                 "user_permissions",
             )
         }),
-        ("Important Dates", {
+        ("Audit", {
             "fields": (
+                "created_at",
+                "updated_at",
+                "uuid",
                 "last_login",
-                "date_joined",
             )
         }),
     )
@@ -76,7 +85,6 @@ class CustomUserAdmin(UserAdmin):
                     "password1",
                     "password2",
                     "role",
-                    "is_verified",
                 ),
             },
         ),
