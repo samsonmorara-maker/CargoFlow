@@ -3,9 +3,15 @@ from rest_framework.exceptions import ValidationError
 from apps.shipments.models import Shipment
 from apps.accounts.models import DriverProfile
 from apps.shipments.services.notifications import notify_delivery_completed
+from django.utils import timezone
 
-
-def process_delivery(driver, delivery_qr_token=None, delivery_code=None):
+def process_delivery(
+        driver,
+        delivery_qr_token=None,
+        delivery_code=None,
+        received_by_name=None,
+        received_by_phone=None,
+        ):
     """
     Confirm delivery using either a QR token
     or the manual delivery code.
@@ -41,7 +47,9 @@ def process_delivery(driver, delivery_qr_token=None, delivery_code=None):
 
     shipment.status = Shipment.Status.DELIVERED
     shipment.delivery_qr_used = True
-
+    shipment.received_by_name = received_by_name
+    shipment.received_by_phone = received_by_phone
+    shipment.received_at = timezone.now()
     # Invalidate the backup code
     shipment.delivery_code = ""
 

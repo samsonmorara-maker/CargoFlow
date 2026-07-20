@@ -52,13 +52,19 @@ class ShipmentViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         result = process_delivery(
-            driver=request.user,
-            delivery_qr_token=serializer.validated_data.get(
-            "delivery_qr_token"
-            ),
-            delivery_code=serializer.validated_data.get(
-            "delivery_code"
-            ),
+        driver=request.user,
+        delivery_qr_token=serializer.validated_data.get(
+        "delivery_qr_token"
+        ),
+        delivery_code=serializer.validated_data.get(
+        "delivery_code"
+        ),
+        received_by_name=serializer.validated_data.get(
+        "received_by_name"
+        ),
+        received_by_phone=serializer.validated_data.get(
+        "received_by_phone"
+        ),
         )
 
         return Response(result, status=status.HTTP_200_OK)

@@ -115,7 +115,20 @@ class Shipment(BaseModel):
         null=True,
         blank=True,
     )
+    received_by_name = models.CharField(
+    max_length=255,
+    blank=True,
+    )
 
+    received_by_phone = models.CharField(
+    max_length=20,
+    blank=True,
+    )
+
+    received_at = models.DateTimeField(
+    null=True,
+    blank=True,
+    )
     is_fragile = models.BooleanField(default=False)
 
     pickup_address = models.TextField()
