@@ -51,7 +51,19 @@ class Shipment(BaseModel):
         unique=True,
         editable=False,
     )
+    pickup_confirmed_at = models.DateTimeField(
+    null=True,
+    blank=True,
+    )
 
+    delivery_confirmed_at = models.DateTimeField(
+    null=True,
+    blank=True,
+    )
+
+    delivery_code_used = models.BooleanField(
+    default=False,
+)
     delivery_code = models.CharField(
     max_length=6,
     blank=True,

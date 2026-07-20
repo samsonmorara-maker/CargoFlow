@@ -1,6 +1,6 @@
 from rest_framework.exceptions import ValidationError
 from apps.shipments.models import Shipment
-
+from django.utils import timezone
 
 def process_pickup(driver, pickup_qr_token):
     shipment = Shipment.objects.filter(
@@ -20,6 +20,7 @@ def process_pickup(driver, pickup_qr_token):
 
     shipment.status = Shipment.Status.PICKED_UP
     shipment.pickup_qr_used = True
+    shipment.pickup_confirmed_at = timezone.now()
     shipment.save()
 
     return {

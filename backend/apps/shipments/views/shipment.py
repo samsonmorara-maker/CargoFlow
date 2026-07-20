@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from apps.shipments.serializers import PickupSerializer
 from apps.shipments.services.pickup import process_pickup
-
+from apps.shipments.serializers import DeliverySerializer
+from apps.shipments.services.delivery import process_delivery
 class ShipmentViewSet(viewsets.ModelViewSet):
     serializer_class = ShipmentSerializer
     permission_classes = [IsAuthenticated]
@@ -42,6 +43,23 @@ class ShipmentViewSet(viewsets.ModelViewSet):
             result,
             status=status.HTTP_200_OK,
         )
+    
+    @action(detail=False, methods=["post"], url_path="confirm-delivery")
+    def confirm_delivery(self, request):
+        serializer = DeliverySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        result = process_delivery(
+            driver=request.user,
+            delivery_qr_token=serializer.validated_data.get(
+            "delivery_qr_token"
+            ),
+            delivery_code=serializer.validated_data.get(
+            "delivery_code"
+            ),
+        )
+
+        return Response(result, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"], url_path="my-deliveries")
     def my_deliveries(self, request):

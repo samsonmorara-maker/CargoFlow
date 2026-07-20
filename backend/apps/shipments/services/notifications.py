@@ -17,3 +17,21 @@ def notify_driver_assigned(shipment):
     print("=" * 60)
 
     return message
+
+def notify_delivery_completed(shipment):
+    """
+    Notify the customer that delivery is complete.
+    """
+
+    message = (
+        f"Hello {shipment.customer.first_name}, "
+        f"your shipment has been delivered successfully."
+    )
+
+    print("=" * 60)
+    print("DELIVERY NOTIFICATION")
+    print(f"To: {shipment.customer.email}")
+    print(message)
+    print("=" * 60)
+
+    return message
