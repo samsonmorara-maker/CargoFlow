@@ -7,3 +7,4 @@ from .shipment_details import (
 )
 from .shipment_event import ShipmentEventSerializer
 from .tracking import TrackingSerializer
+from .cancel import CancelShipmentSerializer

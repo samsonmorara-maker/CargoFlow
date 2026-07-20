@@ -14,6 +14,10 @@ from apps.shipments.serializers import PickupDetailsSerializer
 from apps.shipments.serializers import DeliveryDetailsSerializer
 from apps.shipments.services.events import create_shipment_event
 from apps.shipments.serializers import TrackingSerializer
+from apps.shipments.serializers import CancelShipmentSerializer
+from apps.shipments.services.cancel import cancel_shipment
+
+
 class ShipmentViewSet(viewsets.ModelViewSet):
     serializer_class = ShipmentSerializer
     permission_classes = [IsAuthenticated]
@@ -130,6 +134,38 @@ class ShipmentViewSet(viewsets.ModelViewSet):
         )
 
         return Response(serializer.data)
+    
+    @action(detail=True, methods=["post"], url_path="cancel")
+    def cancel(self, request, uuid=None):
+        shipment = self.get_object()
+
+        if (
+            shipment.customer != request.user
+            and not request.user.is_staff
+        ):
+            return Response(
+            {"detail": "Permission denied."},
+            status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = CancelShipmentSerializer(
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+
+        cancel_shipment(
+            shipment=shipment,
+            user=request.user,
+            reason=serializer.validated_data["reason"],
+        )
+
+        return Response(
+            {
+            "message": "Shipment cancelled successfully."
+            },
+            status=status.HTTP_200_OK,
+            )
+
     @action(detail=False,methods=["get"],url_path=r"track/(?P<tracking_number>[^/.]+)",)
     def track(self, request, tracking_number=None):
         shipment = Shipment.objects.filter(

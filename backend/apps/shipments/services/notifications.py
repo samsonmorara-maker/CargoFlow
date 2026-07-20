@@ -35,3 +35,23 @@ def notify_delivery_completed(shipment):
     print("=" * 60)
 
     return message
+
+def notify_shipment_cancelled(shipment):
+    if shipment.driver:
+        print(
+            f"[NOTIFICATION] Shipment "
+            f"{shipment.tracking_number} "
+            f"was cancelled. Driver "
+            f"{shipment.driver.first_name} "
+            f"{shipment.driver.last_name} "
+            f"is now available."
+        )
+
+def notify_customer_shipment_cancelled(shipment):
+    print(
+        f"[NOTIFICATION] Dear "
+        f"{shipment.customer.first_name}, "
+        f"your shipment "
+        f"{shipment.tracking_number} "
+        f"has been cancelled."
+    )

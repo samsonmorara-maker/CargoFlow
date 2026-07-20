@@ -162,6 +162,24 @@ class Shipment(BaseModel):
 
     delivery_instructions = models.TextField(blank=True)
 
+    cancelled_at = models.DateTimeField(
+    null=True,
+    blank=True,
+    )
+
+    cancellation_reason = models.TextField(
+    blank=True,
+    )
+
+    cancelled_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="cancelled_shipments",
+    )
+
+
     def __str__(self):
         return f"{self.tracking_number} - {self.package_name}"
     
