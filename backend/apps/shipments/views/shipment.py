@@ -13,7 +13,7 @@ from apps.shipments.services.delivery import process_delivery
 from apps.shipments.serializers import PickupDetailsSerializer
 from apps.shipments.serializers import DeliveryDetailsSerializer
 from apps.shipments.services.events import create_shipment_event
-
+from apps.shipments.serializers import TrackingSerializer
 class ShipmentViewSet(viewsets.ModelViewSet):
     serializer_class = ShipmentSerializer
     permission_classes = [IsAuthenticated]
@@ -130,7 +130,30 @@ class ShipmentViewSet(viewsets.ModelViewSet):
         )
 
         return Response(serializer.data)
+    @action(detail=False,methods=["get"],url_path=r"track/(?P<tracking_number>[^/.]+)",)
+    def track(self, request, tracking_number=None):
+        shipment = Shipment.objects.filter(
+            tracking_number=tracking_number
+        ).first()
 
+        if shipment is None:
+            return Response(
+                {"detail": "Shipment not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if (
+            shipment.customer != request.user
+            and not request.user.is_staff
+        ):
+            return Response(
+                {"detail": "Permission denied."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = TrackingSerializer(shipment)
+
+        return Response(serializer.data)
     @action(detail=False, methods=["get"], url_path="my-deliveries")
     def my_deliveries(self, request):
         """

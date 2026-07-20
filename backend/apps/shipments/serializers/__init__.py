@@ -5,3 +5,5 @@ from .shipment_details import (
     PickupDetailsSerializer,
     DeliveryDetailsSerializer,
 )
+from .shipment_event import ShipmentEventSerializer
+from .tracking import TrackingSerializer
