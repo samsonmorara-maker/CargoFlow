@@ -1,26 +1,33 @@
 from apps.accounts.models import DriverProfile
-
+from apps.shipments.services.notifications import notify_driver_assigned
 
 def assign_driver(shipment):
     """
-    Finds the best available driver and assigns
-    the shipment automatically.
+    Automatically assign the best available driver.
     """
 
-    available_driver = (
+    driver_profile = (
         DriverProfile.objects.filter(
-            verification_status="VERIFIED",
-            availability_status="AVAILABLE",
+            verification_status=DriverProfile.VerificationStatus.APPROVED,
+            availability_status=DriverProfile.AvailabilityStatus.ONLINE,
         )
-        .order_by("-rating", "completed_deliveries")
+        .order_by(
+            "completed_deliveries",
+            "-rating",
+        )
         .first()
     )
 
-    if not available_driver:
+    if not driver_profile:
         return None
 
-    shipment.driver = available_driver.user
+    shipment.driver = driver_profile.user
     shipment.status = shipment.Status.DRIVER_ASSIGNED
     shipment.save()
 
-    return available_driver.user
+    driver_profile.availability_status = (
+        DriverProfile.AvailabilityStatus.BUSY
+    )
+    driver_profile.save()
+    notify_driver_assigned(shipment)
+    return driver_profile.user

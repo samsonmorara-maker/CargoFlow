@@ -2,8 +2,8 @@ from django.db import models
 from django.utils import timezone
 from apps.common.models import BaseModel
 from apps.accounts.models import User
-
-
+import uuid
+from apps.shipments.utils import generate_delivery_code
 class Shipment(BaseModel):
 
     class GoodsType(models.TextChoices):
@@ -40,7 +40,31 @@ class Shipment(BaseModel):
         unique=True,
         editable=False,
     )
+    pickup_qr_token = models.UUIDField(
+    default=uuid.uuid4,
+    unique=True,
+    editable=False,
+    )
 
+    delivery_qr_token = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+    )
+
+    delivery_code = models.CharField(
+    max_length=6,
+    blank=True,
+    editable=False,
+)
+
+    pickup_qr_used = models.BooleanField(
+    default=False,
+    )
+
+    delivery_qr_used = models.BooleanField(
+    default=False,
+    )
     customer = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -136,5 +160,6 @@ class Shipment(BaseModel):
                 next_number = 1
 
             self.tracking_number = f"CFG{year}{next_number:06d}"
-
+        if not self.delivery_code:
+            self.delivery_code = generate_delivery_code()
         super().save(*args, **kwargs)

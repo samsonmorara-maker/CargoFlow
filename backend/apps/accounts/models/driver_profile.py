@@ -22,7 +22,9 @@ class DriverProfile(BaseModel):
 
     license_number = models.CharField(
         max_length=100,
-        unique=True
+        unique=True,
+        blank=True,
+        null=True,
     )
 
     verification_status = models.CharField(

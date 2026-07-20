@@ -1,7 +1,7 @@
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
+from apps.accounts.models import User, DriverProfile
 
-from apps.accounts.models import User
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -52,6 +52,11 @@ class SignupSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(
             password=password,
             **validated_data,
+        )
+
+        if user.role == User.Role.DRIVER:
+            DriverProfile.objects.create(
+            user=user,
         )
 
         return user

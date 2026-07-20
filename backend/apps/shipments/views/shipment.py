@@ -3,7 +3,11 @@ from rest_framework.permissions import IsAuthenticated
 from apps.shipments.services.driver_assignment import assign_driver
 from apps.shipments.models import Shipment
 from apps.shipments.serializers import ShipmentSerializer
-
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
+from apps.shipments.serializers import PickupSerializer
+from apps.shipments.services.pickup import process_pickup
 
 class ShipmentViewSet(viewsets.ModelViewSet):
     serializer_class = ShipmentSerializer
@@ -23,3 +27,30 @@ class ShipmentViewSet(viewsets.ModelViewSet):
         shipment = serializer.save(customer=self.request.user)
 
         assign_driver(shipment)
+
+    @action(detail=False, methods=["post"], url_path="pickup")
+    def pickup(self, request):
+        serializer = PickupSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        result = process_pickup(
+            driver=request.user,
+            pickup_qr_token=serializer.validated_data["pickup_qr_token"],
+        )
+
+        return Response(
+            result,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=False, methods=["get"], url_path="my-deliveries")
+    def my_deliveries(self, request):
+        """
+        Return shipments assigned to the logged-in driver.
+        """
+
+        shipments = Shipment.objects.filter(driver=request.user)
+
+        serializer = self.get_serializer(shipments, many=True)
+
+        return Response(serializer.data)
