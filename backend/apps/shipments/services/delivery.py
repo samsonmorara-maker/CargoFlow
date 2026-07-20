@@ -1,5 +1,6 @@
 from rest_framework.exceptions import ValidationError
-
+from apps.shipments.services.events import create_shipment_event
+from apps.shipments.models import ShipmentEvent
 from apps.shipments.models import Shipment
 from apps.accounts.models import DriverProfile
 from apps.shipments.services.notifications import notify_delivery_completed
@@ -54,7 +55,16 @@ def process_delivery(
     shipment.delivery_code = ""
 
     shipment.save()
-
+    create_shipment_event(
+        shipment=shipment,
+        event_type=ShipmentEvent.EventType.DELIVERED,
+        description=(
+            f"Package delivered by "
+            f"{driver.first_name} {driver.last_name} "
+            f"to {shipment.received_by_name}."
+        ),
+        performed_by=driver,
+        )
     driver_profile = DriverProfile.objects.get(
         user=driver
     )

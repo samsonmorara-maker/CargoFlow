@@ -1,6 +1,9 @@
 from rest_framework.exceptions import ValidationError
 from apps.shipments.models import Shipment
 from django.utils import timezone
+from apps.shipments.services.events import create_shipment_event
+from apps.shipments.models import ShipmentEvent
+
 
 def process_pickup(driver, pickup_qr_token):
     shipment = Shipment.objects.filter(
@@ -22,7 +25,15 @@ def process_pickup(driver, pickup_qr_token):
     shipment.pickup_qr_used = True
     shipment.pickup_confirmed_at = timezone.now()
     shipment.save()
-
+    create_shipment_event(
+        shipment=shipment,
+        event_type=ShipmentEvent.EventType.PICKED_UP,
+        description=(
+            f"Package picked up by "
+            f"{driver.first_name} {driver.last_name}."
+        ),
+        performed_by=driver,
+    )
     return {
         "message": "Pickup confirmed successfully.",
         "delivery_address": shipment.delivery_address,

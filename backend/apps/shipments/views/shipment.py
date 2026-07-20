@@ -12,6 +12,8 @@ from apps.shipments.serializers import DeliverySerializer
 from apps.shipments.services.delivery import process_delivery
 from apps.shipments.serializers import PickupDetailsSerializer
 from apps.shipments.serializers import DeliveryDetailsSerializer
+from apps.shipments.services.events import create_shipment_event
+
 class ShipmentViewSet(viewsets.ModelViewSet):
     serializer_class = ShipmentSerializer
     permission_classes = [IsAuthenticated]
@@ -28,6 +30,12 @@ class ShipmentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         shipment = serializer.save(customer=self.request.user)
+        create_shipment_event(
+            shipment=shipment,
+            event_type="CREATED",
+            description="Shipment was created.",
+            performed_by=self.request.user,
+            )
 
         assign_driver(shipment)
 
@@ -70,7 +78,7 @@ class ShipmentViewSet(viewsets.ModelViewSet):
         return Response(result, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=["get"], url_path="pickup-details")
-    def pickup_details(self, request, pk=None):
+    def pickup_details(self, request, uuid=None):
         shipment = self.get_object()
 
         if (
