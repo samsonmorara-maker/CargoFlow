@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+     'drf_spectacular',
     'apps.common',
     'apps.accounts',
     'apps.shipments'
@@ -112,6 +113,14 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+
+    "DEFAULT_SCHEMA_CLASS": (
+        "drf_spectacular.openapi.AutoSchema"
+    )
+
 }
 
 SIMPLE_JWT = {
@@ -133,6 +142,17 @@ USE_I18N = True
 USE_TZ = True
 
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "CargoFlow API",
+    "DESCRIPTION": (
+        "CargoFlow is a logistics platform that automates "
+        "shipment management, driver assignment, package "
+        "pickup, delivery confirmation, shipment tracking "
+        "and administration."
+    ),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
