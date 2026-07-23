@@ -6,7 +6,12 @@ from apps.accounts.serializers.signup import SignupSerializer
 from apps.accounts.serializers.login import LoginSerializer
 from apps.accounts.serializers.user import UserSerializer
 from rest_framework.permissions import AllowAny
-
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from apps.accounts.models import Vehicle
+from apps.accounts.serializers import VehicleSerializer
+from rest_framework.decorators import action
+from rest_framework.response import Response
 class SignupView(generics.CreateAPIView):
     permission_classes = [AllowAny]   
     queryset = User.objects.all()
@@ -48,3 +53,32 @@ class LoginView(generics.GenericAPIView):
             },
             status=status.HTTP_200_OK,
         )
+
+class VehicleViewSet(viewsets.ModelViewSet):
+    serializer_class = VehicleSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Vehicle.objects.filter(driver=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(driver=self.request.user)
+
+
+    @action(detail=False, methods=["get"], url_path="my-vehicle")
+    def my_vehicle(self, request):
+        vehicle = Vehicle.objects.filter(
+        driver=request.user
+    ).first()
+
+        if vehicle is None:
+            return Response(
+            {"has_vehicle": False}
+        )
+
+        serializer = self.get_serializer(vehicle)
+
+        return Response({
+        "has_vehicle": True,
+        "vehicle": serializer.data,
+        })

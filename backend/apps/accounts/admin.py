@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-
+from apps.accounts.models import Vehicle
 from apps.accounts.models import DriverProfile, User
 
 
@@ -115,3 +115,5 @@ class DriverProfileAdmin(admin.ModelAdmin):
         "user__email",
         "license_number",
     )
+
+admin.site.register(Vehicle)
