@@ -9,6 +9,11 @@ class User( BaseModel, AbstractBaseUser, PermissionsMixin ):
         CUSTOMER = "CUSTOMER", "Customer"
         DRIVER = "DRIVER", "Driver"
         ADMIN = "ADMIN", "Admin"
+    class DriverStatus(models.TextChoices):
+            PENDING = "PENDING", "Pending"
+            APPROVED = "APPROVED", "Approved"
+            REJECTED = "REJECTED", "Rejected"
+    
     
     username = None
     first_name = models.CharField(max_length=100)
@@ -22,7 +27,12 @@ class User( BaseModel, AbstractBaseUser, PermissionsMixin ):
         default=Role.CUSTOMER,
         db_index=True,
     )
-
+    driver_status = models.CharField(
+                max_length=20,
+                choices=DriverStatus.choices,
+                default=DriverStatus.PENDING,
+                )   
+    driver_approved = models.BooleanField(default=False)
     profile_picture = models.ImageField(
         upload_to="profiles/",
         blank=True,
@@ -41,7 +51,7 @@ class User( BaseModel, AbstractBaseUser, PermissionsMixin ):
         ordering = ["-created_at"]
         verbose_name = "User"
         verbose_name_plural = "Users"
-        
+    
 
     def __str__(self):
         return f"{self.email} ({self.role})"

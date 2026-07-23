@@ -26,7 +26,7 @@ class SignupSerializer(serializers.ModelSerializer):
             "confirm_password",
             "role",
         )
-
+    
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError(
@@ -60,3 +60,11 @@ class SignupSerializer(serializers.ModelSerializer):
         )
 
         return user
+
+    def validate_role(self, value):
+        if value == User.Role.ADMIN:
+            raise serializers.ValidationError(
+            "You cannot register as an administrator."
+            )
+
+        return value

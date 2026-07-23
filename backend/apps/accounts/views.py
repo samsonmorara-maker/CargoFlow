@@ -5,9 +5,10 @@ from apps.accounts.models import User
 from apps.accounts.serializers.signup import SignupSerializer
 from apps.accounts.serializers.login import LoginSerializer
 from apps.accounts.serializers.user import UserSerializer
-
+from rest_framework.permissions import AllowAny
 
 class SignupView(generics.CreateAPIView):
+    permission_classes = [AllowAny]   
     queryset = User.objects.all()
     serializer_class = SignupSerializer
 
@@ -27,6 +28,7 @@ class SignupView(generics.CreateAPIView):
     
 
 class LoginView(generics.GenericAPIView):
+    permission_classes = [AllowAny]   
     serializer_class = LoginSerializer
 
     def post(self, request):
