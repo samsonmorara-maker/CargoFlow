@@ -17,6 +17,7 @@ def cancel_shipment(
 
     if shipment.status not in (
         Shipment.Status.PENDING,
+        Shipment.Status.CONFIRMED,
         Shipment.Status.DRIVER_ASSIGNED,
     ):
         raise ValidationError(
@@ -31,10 +32,10 @@ def cancel_shipment(
     shipment.save()
 
     if shipment.driver:
-        driver_profile = DriverProfile.objects.get(
+        driver_profile = DriverProfile.objects.filter(
             user=shipment.driver
-        )
-
+        ).first()
+    if driver_profile:
         driver_profile.availability_status = (
             DriverProfile.AvailabilityStatus.ONLINE
         )

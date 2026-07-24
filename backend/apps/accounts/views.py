@@ -11,7 +11,10 @@ from rest_framework.permissions import IsAuthenticated
 from apps.accounts.models import Vehicle
 from apps.accounts.serializers import VehicleSerializer
 from rest_framework.decorators import action
-from rest_framework.response import Response
+from rest_framework.views import APIView
+from apps.accounts.serializers import ChangePasswordSerializer
+
+from apps.accounts.serializers import ProfileSerializer
 class SignupView(generics.CreateAPIView):
     permission_classes = [AllowAny]   
     queryset = User.objects.all()
@@ -82,3 +85,59 @@ class VehicleViewSet(viewsets.ModelViewSet):
         "has_vehicle": True,
         "vehicle": serializer.data,
         })
+
+
+    
+class ProfileView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = ProfileSerializer(request.user)
+        return Response(serializer.data)
+
+    def patch(self, request):
+        serializer = ProfileSerializer(
+            request.user,
+            data=request.data,
+            partial=True,
+        )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
+
+
+class ChangePasswordView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(
+            data=request.data
+        )
+
+        serializer.is_valid(raise_exception=True)
+
+        if not request.user.check_password(
+            serializer.validated_data["current_password"]
+        ):
+            return Response(
+                {
+                    "detail": "Current password is incorrect."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        request.user.set_password(
+            serializer.validated_data["new_password"]
+        )
+
+        request.user.save()
+
+        return Response(
+            {
+                "message": "Password changed successfully."
+            }
+        )
