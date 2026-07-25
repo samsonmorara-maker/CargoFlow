@@ -4,7 +4,13 @@ from rest_framework import serializers
 class PickupDetailsSerializer(serializers.Serializer):
     tracking_number = serializers.CharField()
     pickup_qr_token = serializers.UUIDField()
+    pickup_code = serializers.CharField()   
     pickup_address = serializers.CharField()
+
+    driver_name = serializers.CharField(required=False)
+    driver_phone = serializers.CharField(required=False)
+    vehicle_type = serializers.CharField(required=False)
+    vehicle_number_plate = serializers.CharField(required=False)
 
 
 class DeliveryDetailsSerializer(serializers.Serializer):

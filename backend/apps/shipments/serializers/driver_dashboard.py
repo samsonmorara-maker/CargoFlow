@@ -2,8 +2,8 @@ from rest_framework import serializers
 
 
 class DriverDashboardSerializer(serializers.Serializer):
-    active_deliveries = serializers.IntegerField()
     pending_pickups = serializers.IntegerField()
+    active_deliveries = serializers.IntegerField()
+    in_transit = serializers.IntegerField()
     completed_today = serializers.IntegerField()
     total_completed = serializers.IntegerField()
-    in_transit = serializers.IntegerField()

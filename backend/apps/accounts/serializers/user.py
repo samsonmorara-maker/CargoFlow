@@ -14,6 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "phone_number",
             "role",
+            "is_staff", 
             "profile_picture",
             "is_verified",
             "created_at",
@@ -22,6 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         read_only_fields = (
             "uuid",
+            "is_staff", 
             "is_verified",
             "created_at",
             "updated_at",

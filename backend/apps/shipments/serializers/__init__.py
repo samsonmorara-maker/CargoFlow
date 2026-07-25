@@ -9,3 +9,4 @@ from .shipment_event import ShipmentEventSerializer
 from .tracking import TrackingSerializer
 from .cancel import CancelShipmentSerializer
 from .dashboard import DashboardSerializer
+from .driver_dashboard import DriverDashboardSerializer

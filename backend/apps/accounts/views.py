@@ -13,8 +13,12 @@ from apps.accounts.serializers import VehicleSerializer
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from apps.accounts.serializers import ChangePasswordSerializer
-
+from django.db.models import Count
+from rest_framework.permissions import IsAdminUser
+from apps.accounts.models import User
+from apps.accounts.serializers.customer import CustomerSerializer
 from apps.accounts.serializers import ProfileSerializer
+from apps.accounts.serializers.driver import DriverSerializer
 class SignupView(generics.CreateAPIView):
     permission_classes = [AllowAny]   
     queryset = User.objects.all()
@@ -140,4 +144,30 @@ class ChangePasswordView(APIView):
             {
                 "message": "Password changed successfully."
             }
+        )
+
+class CustomerListView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = CustomerSerializer
+
+    def get_queryset(self):
+        return (
+            User.objects.filter(role="CUSTOMER")
+            .annotate(
+                total_shipments=Count("shipments")
+            )
+            .order_by("first_name")
+        )
+
+class DriverListView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = DriverSerializer
+
+    def get_queryset(self):
+        return (
+            User.objects.filter(role="DRIVER")
+            .annotate(
+                completed_deliveries=Count("shipments")
+            )
+            .order_by("first_name")
         )

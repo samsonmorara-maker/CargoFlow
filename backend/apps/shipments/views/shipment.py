@@ -16,8 +16,9 @@ from apps.shipments.services.events import create_shipment_event
 from apps.shipments.serializers import TrackingSerializer
 from apps.shipments.serializers import CancelShipmentSerializer
 from apps.shipments.services.cancel import cancel_shipment
-
-
+from django.utils import timezone
+from apps.shipments.serializers import DashboardSerializer
+from apps.shipments.serializers import DriverDashboardSerializer
 class ShipmentViewSet(viewsets.ModelViewSet):
     serializer_class = ShipmentSerializer
     permission_classes = [IsAuthenticated]
@@ -92,13 +93,33 @@ class ShipmentViewSet(viewsets.ModelViewSet):
             return Response(
             {"detail": "Permission denied."},
             status=status.HTTP_403_FORBIDDEN,
-        )
+            )
 
         serializer = PickupDetailsSerializer(
             {
-            "tracking_number": shipment.tracking_number,
-            "pickup_qr_token": shipment.pickup_qr_token,
-            "pickup_address": shipment.pickup_address,
+                "tracking_number": shipment.tracking_number,
+                "pickup_qr_token": shipment.pickup_qr_token,
+                "pickup_code": shipment.pickup_code,
+                "pickup_address": shipment.pickup_address,
+
+                "driver_name": (
+                    f"{shipment.driver.first_name} {shipment.driver.last_name}"
+                    if shipment.driver else None
+                    ),
+                "driver_phone": (
+                    shipment.driver.phone_number
+                    if shipment.driver else None
+                ),
+                "vehicle_type": (
+                    shipment.driver.vehicle.vehicle_type
+                    if shipment.driver and hasattr(shipment.driver, "vehicle")
+                    else None
+                ),
+                "vehicle_number_plate": (
+                    shipment.driver.vehicle.number_plate
+                    if shipment.driver and hasattr(shipment.driver, "vehicle")
+                    else None
+                ),
             }
         )
 
@@ -202,4 +223,59 @@ class ShipmentViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
     
+    @action(detail=False, methods=["get"], url_path="driver-dashboard")
+    def driver_dashboard(self, request):
+        if request.user.role != "DRIVER":
+            return Response(
+            {"detail": "Permission denied."},
+            status=status.HTTP_403_FORBIDDEN,
+            )
 
+        today = timezone.now().date()
+
+        assigned = Shipment.objects.filter(driver=request.user)
+
+        data = {
+        "active_deliveries": assigned.filter(
+            status=Shipment.Status.IN_TRANSIT
+        ).count(),
+
+        "pending_pickups": assigned.filter(
+            status=Shipment.Status.DRIVER_ASSIGNED
+        ).count(),
+
+        "completed_today": assigned.filter(
+            status=Shipment.Status.DELIVERED,
+            delivery_confirmed_at__date=today,
+        ).count(),
+
+        "total_completed": assigned.filter(
+            status=Shipment.Status.DELIVERED,
+        ).count(),
+
+        "in_transit": assigned.filter(
+            status=Shipment.Status.IN_TRANSIT,
+        ).count(),
+        }
+
+        serializer = DriverDashboardSerializer(data)
+
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=["get"], url_path="history")
+    def history(self, request):
+        """
+     Return completed deliveries for the logged-in driver.
+        """
+
+        shipments = Shipment.objects.filter(
+            driver=request.user,
+            status=Shipment.Status.DELIVERED,
+        ).order_by("-updated_at")
+
+        serializer = self.get_serializer(
+        shipments,
+        many=True,
+        )
+
+        return Response(serializer.data)

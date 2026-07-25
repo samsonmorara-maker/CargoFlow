@@ -5,10 +5,15 @@ from apps.shipments.models import Shipment
 class ShipmentSerializer(serializers.ModelSerializer):
     driver_name = serializers.SerializerMethodField()
     driver_phone = serializers.SerializerMethodField()
+    driver_email = serializers.SerializerMethodField()
 
     vehicle_type = serializers.SerializerMethodField()
     vehicle_color = serializers.SerializerMethodField()
     vehicle_number_plate = serializers.SerializerMethodField()
+
+    customer_name = serializers.SerializerMethodField()
+    customer_phone = serializers.SerializerMethodField()
+    customer_email = serializers.SerializerMethodField()
     class Meta:
         model = Shipment
 
@@ -33,14 +38,22 @@ class ShipmentSerializer(serializers.ModelSerializer):
         "pickup_confirmed_at",
         "delivery_confirmed_at",
         "customer",
+        "customer_name",
+        "customer_phone",
+        "customer_email",
+
         "driver",
-        "created_at",
-        "updated_at",
         "driver_name",
         "driver_phone",
+        "driver_email",
+
+        "created_at",
+        "updated_at",
+
         "vehicle_type",
         "vehicle_color",
         "vehicle_number_plate",
+        
         )
 
         read_only_fields = (
@@ -85,3 +98,18 @@ class ShipmentSerializer(serializers.ModelSerializer):
         if obj.driver and hasattr(obj.driver, "vehicle"):
             return obj.driver.vehicle.number_plate
         return None
+
+    def get_customer_name(self, obj):
+        return f"{obj.customer.first_name} {obj.customer.last_name}"
+
+    def get_customer_phone(self, obj):
+        return obj.customer.phone_number
+
+    def get_driver_email(self, obj):
+        if obj.driver:
+            return obj.driver.email
+        return None
+
+
+    def get_customer_email(self, obj):
+        return obj.customer.email

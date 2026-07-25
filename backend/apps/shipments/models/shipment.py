@@ -45,7 +45,11 @@ class Shipment(BaseModel):
     unique=True,
     editable=False,
     )
-
+    pickup_code = models.CharField(
+    max_length=6,
+    blank=True,
+    editable=False,
+)
     delivery_qr_token = models.UUIDField(
         default=uuid.uuid4,
         unique=True,
@@ -203,6 +207,8 @@ class Shipment(BaseModel):
                 next_number = 1
 
             self.tracking_number = f"CFG{year}{next_number:06d}"
+        if not self.pickup_code:
+            self.pickup_code = generate_delivery_code()
         if not self.delivery_code:
             self.delivery_code = generate_delivery_code()
         super().save(*args, **kwargs)
