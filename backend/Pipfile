@@ -12,6 +12,8 @@ pillow = "*"
 djangorestframework-simplejwt = "*"
 drf-spectacular = "*"
 django-cors-headers = "*"
+gunicorn = "*"
+whitenoise = "*"
 
 [dev-packages]
 

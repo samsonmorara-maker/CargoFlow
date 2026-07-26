@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Pipenv
+Pipfile.lock
+
+# Environment variables
+.env
+
+# Git
+.git
+.gitignore
+
+# VS Code
+.vscode/
+
+staticfiles/
+
+# Logs
+*.log
+
+# Docker
+Dockerfile
+docker-compose.yml
