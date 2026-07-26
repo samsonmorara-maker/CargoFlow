@@ -18,18 +18,21 @@ from apps.shipments.serializers import CancelShipmentSerializer
 from apps.shipments.services.cancel import cancel_shipment
 from django.utils import timezone
 from apps.shipments.serializers import DashboardSerializer
+from apps.accounts.models import User
 from apps.shipments.serializers import DriverDashboardSerializer
 class ShipmentViewSet(viewsets.ModelViewSet):
     serializer_class = ShipmentSerializer
     permission_classes = [IsAuthenticated]
 
     lookup_field = "uuid"
-
     def get_queryset(self):
         user = self.request.user
 
         if user.is_staff:
             return Shipment.objects.all()
+
+        if user.role == User.Role.DRIVER:
+            return Shipment.objects.filter(driver=user)
 
         return Shipment.objects.filter(customer=user)
 
