@@ -169,7 +169,7 @@ SPECTACULAR_SETTINGS = {
 CORS_ALLOWED_ORIGINS = config(
     "CORS_ALLOWED_ORIGINS",
     cast=lambda v: [origin.strip() for origin in v.split(",")],
-    default="http://localhost:5173,http://127.0.0.1:5173",
+    default="http://localhost:5173,http://127.0.0.1:5173,https://samsonmorara-maker.github.io",
 )
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
