@@ -49,9 +49,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "corsheaders",
     'rest_framework',
-     'drf_spectacular',
+    'drf_spectacular',
     'apps.common',
     'apps.accounts',
+    "apps.assignments",
     'apps.shipments'
 ]
 

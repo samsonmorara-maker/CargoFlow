@@ -6,27 +6,51 @@ from apps.accounts.models.user import User
 
 class Vehicle(BaseModel):
 
+    class VehicleCategory(models.TextChoices):
+        TRUCK = "TRUCK", "Truck"
+        VAN = "VAN", "Van"
+        CAR = "CAR", "Car"
+        MOTORCYCLE = "MOTORCYCLE", "Motorcycle"
+        BICYCLE = "BICYCLE", "Bicycle"
+        SCOOTER = "SCOOTER", "Scooter"
+        WALKING = "WALKING", "Walking"
+
+    class OwnershipType(models.TextChoices):
+        OWNER = "OWNER", "Owner"
+        COMPANY = "COMPANY", "Company Vehicle"
+        RENTAL = "RENTAL", "Rental"
+        BORROWED = "BORROWED", "Borrowed"
+
     driver = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         related_name="vehicle",
     )
 
-    vehicle_type = models.CharField(
-        max_length=100,
-        validators=[MinLengthValidator(3)],
-        help_text="Example: Toyota Hiace, Mercedes Sprinter, Box Truck",
+    category = models.CharField(
+        max_length=20,
+        choices=VehicleCategory.choices,
     )
 
-    make = models.CharField(max_length=100)
-
-    model = models.CharField(max_length=100)
-
-    color = models.CharField(max_length=50)
-
-    number_plate = models.CharField(
+    ownership_type = models.CharField(
         max_length=20,
-        unique=True,
+        choices=OwnershipType.choices,
+        default=OwnershipType.OWNER,
+    )
+
+    make = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    model = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    color = models.CharField(
+        max_length=50,
+        blank=True,
     )
 
     year = models.PositiveIntegerField(
@@ -34,7 +58,41 @@ class Vehicle(BaseModel):
         blank=True,
     )
 
+    number_plate = models.CharField(
+        max_length=20,
+        unique=True,
+        blank=True,
+    )
+
+    owner_name = models.CharField(
+        max_length=255,
+        blank=True,
+    )
+
+    owner_phone = models.CharField(
+        max_length=20,
+        blank=True,
+    )
+
+    registration_document = models.FileField(
+        upload_to="vehicle_documents/",
+        blank=True,
+        null=True,
+    )
+
+    insurance_document = models.FileField(
+        upload_to="vehicle_documents/",
+        blank=True,
+        null=True,
+    )
+
+    inspection_certificate = models.FileField(
+        upload_to="vehicle_documents/",
+        blank=True,
+        null=True,
+    )
+
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.number_plate
+        return f"{self.driver.email} - {self.category}"
